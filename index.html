@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Readmission Rate Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result, .error {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Patient Readmission Rate Calculator</h2>
+        <div class="form-group">
+            <label for="total_discharges">Total Number of Discharges:</label>
+            <input type="number" id="total_discharges" required>
+        </div>
+        <div class="form-group">
+            <label for="readmissions">Number of Readmissions:</label>
+            <input type="number" id="readmissions" required>
+        </div>
+        <button onclick="calculateReadmissionRate()">Calculate</button>
+        <div id="result" class="result"></div>
+        <div id="error" class="error"></div>
+    </div>
+    <script>
+        async function calculateReadmissionRate() {
+    const totalDischarges = document.getElementById("total_discharges").value;
+    const readmissions = document.getElementById("readmissions").value;
+    const resultDiv = document.getElementById("result");
+    const errorDiv = document.getElementById("error");
+
+    // Clear previous messages
+    resultDiv.textContent = '';
+    errorDiv.textContent = '';
+
+    if (!totalDischarges || !readmissions) {
+        errorDiv.textContent = "Please fill in both fields.";
+        return;
+    }
+
+    try {
+        const response = await axios.post('http://localhost:3000/calculate', {
+            totalDischarges: Number(totalDischarges),
+            readmissions: Number(readmissions),
+        });
+
+        const data = response.data;
+        if (data.error) {
+            errorDiv.textContent = data.error;
+        } else {
+            resultDiv.textContent = `Readmission Rate: ${data.readmissionRate.toFixed(2)}%`;
+        }
+    } catch (error) {
+        errorDiv.textContent = "Error calculating the readmission rate.";
+        console.error(error);
+    }
+}
+
+    </script>
+</body>
+</html>
